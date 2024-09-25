@@ -103,4 +103,4 @@ function playGame () {
 
 // Start game
 const options = ["rock", "paper", "scissors"];
-playGame();
+//playGame();

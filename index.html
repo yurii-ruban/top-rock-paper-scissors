@@ -8,8 +8,27 @@
 </head>
 <body>
     <div class="container">
-        <p class="main-text">Just and alert based version</p>
-        <p class="subtext">It's not ready to play with UI yet!</p>
+        <div class="element" id="rock">
+            <div class="image-container">
+                <div class="image">🪨</div>
+            </div>
+            <p class="description">Rock beats Scissors<br>But loses to Paper</p>
+            <div class="button-block"><button id="rock-button">Rock</button></div>
+        </div>
+        <div class="element" id="paper">
+            <div class="image-container">
+                <div class="image">📜</div>
+            </div>
+            <p class="description">Paper beats Rock<br>But loses to Scissors</p>
+            <div class="button-block"><button id="paper-button">Paper</button></div>
+        </div>
+        <div class="element" id="scissors">
+            <div class="image-container">
+                <div class="image">✂️</div>
+            </div>
+            <p class="description">Scissors beats Paper<br>But loses to Rock</p>
+            <div class="button-block"><button id="scissors-button">Scissors</button></div>
+        </div>
     </div>
     <script defer src="./js/index.js"></script>
 </body>
