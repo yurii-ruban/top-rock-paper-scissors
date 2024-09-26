@@ -10,7 +10,7 @@ let finishedGame = false;
 
 let options = new Map();
 options.set(0, "rock");
-options.set(1, "scissors");
+options.set(1, "paper");
 options.set(2, "scissors");
 
 
@@ -19,47 +19,69 @@ function getComputerChoice(minRange, maxRange) {
     return options.get(num);
 }
 
-function recordHumanChoice(option) {
+function clearChildrenBorders (parent) {
+    const children = parent.querySelectorAll(".element");
+    
+    for (child of children) {
+        child.classList.remove("with-outer-green");
+        child.classList.remove("with-outer-red");
+        child.classList.remove("with-outer-gold");
+    }
+}
+
+function playRoundByInput(option) {
     let compChoice = getComputerChoice(0, 3);
+    const computerButton = document.querySelector(`#${compChoice}-button`);
 
     let signal = new CustomEvent("updateState", {detail : {result : ""}});
     if (option === compChoice) { // draw condition
         signal.detail.result = "draw";
+        computerButton.parentElement.parentElement.classList.add("with-outer-gold");
     }
-    else if ((option === "rock" && compChoice === "scissors") ||
+    else {
+        
+        if ((option === "rock" && compChoice === "scissors") ||
         (option === "paper" && compChoice === "rock") ||
         (option === "scissors" && compChoice === "paper")) { // win condition
         signal.detail.result = "win";
+        }
+        else { // lose condition
+            signal.detail.result = "lose";
+        }
+        computerButton.parentElement.parentElement.classList.add("with-outer-red");
     }
-    else { // lose condition
-        signal.detail.result = "lose";
-    }
+
 
     document.dispatchEvent(signal);
 }
 
 function playGame () {
-    let container = document.querySelector(".container");
+    const container = document.querySelector(".container");
 
     container.addEventListener("click", (clickEvent) => {
         var target = clickEvent.target.id;
+        clearChildrenBorders(container);
+
         switch (target) {
             case ROCK_BUTTON: {
-                recordHumanChoice("rock");
+                playRoundByInput("rock");
                 break;
             }
             case PAPER_BUTTON: {
-                recordHumanChoice("paper");
+                playRoundByInput("paper");
                 break;
             }
             case SCISSORS_BUTTON: {
-                recordHumanChoice("scissors");
+                playRoundByInput("scissors");
                 break;
             }
             default: {
                 break;
             }
         }
+
+        const element = clickEvent.target.parentElement.parentElement;
+        element.classList.add("with-outer-green");
     });
 
     document.addEventListener("updateState", (updateEvent) => {
@@ -93,9 +115,7 @@ function playGame () {
             }
         }
 
-        roundInfo.textContent = `Round ${round} of ${MAX_ROUNDS}`;
-
-        
+        roundInfo.textContent = `Round ${round} of ${MAX_ROUNDS}`;        
 
     });
 }
@@ -145,9 +165,19 @@ function endGame() {
         computerScore = 0;
         humanScore = 0;
         round = 1;
+        const playerScoreField = document.querySelector(".player-score");
+        const computerScoreField = document.querySelector(".computer-score");
+        const roundInfo = document.querySelector(".round-info");
+        playerScoreField.textContent = `Player score: ${humanScore}`;
+        computerScoreField.textContent = `Computer score: ${computerScore}`;
+        roundInfo.textContent = `Round ${round} of ${MAX_ROUNDS}`;
+
         scoreContainer.style["border-bottom"] = "none";
         infoContainer.style["background-color"] = "transparent";
         infoContainer.style["border-color"] = "black";
+
+        const container = document.querySelector(".container");
+        clearChildrenBorders(container);
 
         finalMessage.remove();
         restartButton.remove();

@@ -35,6 +35,7 @@ body {
 }
 
 .element {
+    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
@@ -44,6 +45,42 @@ body {
     border-radius: 30px;
 
     cursor: default;
+}
+
+.element.with-outer-green::after {
+    position: absolute;
+    content: "";
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    border: 8px solid #2ecc71; /* Зовнішній бордер */
+    border-radius: 30px; /* Заокруглення */
+    z-index: -1;
+}
+
+.element.with-outer-red::after {
+    position: absolute;
+    content: "";
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    border: 8px solid #d32417; /* Зовнішній бордер */
+    border-radius: 30px; /* Заокруглення */
+    z-index: -1;
+}
+
+.element.with-outer-gold::after {
+    position: absolute;
+    content: "";
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    border: 8px solid #e3d80e; /* Зовнішній бордер */
+    border-radius: 30px; /* Заокруглення */
+    z-index: -1;
 }
 
 .element#paper {
@@ -119,13 +156,6 @@ body {
     border-width: 2px;
     border-style: solid;
     border-radius: 30px;
-
-    /* border-color: red;
-    background-color: lightcoral; */
-    /* border-color: green; */
-    /* background-color: lightgreen; */
-    /* border-color: goldenrod;
-    background-color: gold; */
 }
 
 .info p {
@@ -136,7 +166,6 @@ body {
     display: flex;
     justify-content: space-around;
     gap: 2em;
-    /* border-bottom: 1px solid black; */
 }
 
 .result-box {
@@ -151,11 +180,12 @@ body {
     border-radius: 10px;
     font-size: 28px;
     padding: 0.5em;
+}
 
-    /* border-color: green;
-    background-color: rgb(175, 255, 175); */
-    /* border-color: red;
-    background-color: #fc9b9e; */
-    /* border-color: goldenrod;
-    background-color: rgb(236, 218, 116); */
+.player-score {
+    color: green;
+}
+
+.computer-score {
+    color: red;
 }
