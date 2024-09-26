@@ -67,7 +67,7 @@ function playGame () {
         const computerScoreField = document.querySelector(".computer-score");
         const roundInfo = document.querySelector(".round-info");
 
-        if (round++ > MAX_ROUNDS) {
+        if (++round > MAX_ROUNDS) {
             if (!finishedGame) endGame();
             return;
         }
