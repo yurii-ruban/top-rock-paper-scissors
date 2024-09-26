@@ -17,3 +17,6 @@ https://yurii-ruban.github.io/top-rock-paper-scissors
 
 ## Purpose
 The Rock Paper Scisors game presents the ability and understanding the very basic foundation of Js programming. It is done for studying purposes
+
+## Screenshot
+![Screenshot](./img/Screenchot.png)
