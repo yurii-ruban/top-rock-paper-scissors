@@ -1,106 +1,160 @@
-function getComputerChoice(options, minRange, maxRange) {
+const MAX_ROUNDS = 5;
+const ROCK_BUTTON = "rock-button";
+const PAPER_BUTTON = "paper-button";
+const SCISSORS_BUTTON = "scissors-button";
+
+let round = 1;
+let humanScore = 0;
+let computerScore = 0;
+let finishedGame = false;
+
+let options = new Map();
+options.set(0, "rock");
+options.set(1, "scissors");
+options.set(2, "scissors");
+
+
+function getComputerChoice(minRange, maxRange) {
     const num = Math.floor(Math.random() * 3);
-    return options[num];
+    return options.get(num);
 }
 
-function getHumanChoice() {
-    let answer = prompt("Please enter your choice (rock, paper or scissors): ");
-    return answer.toLowerCase();
-}
+function recordHumanChoice(option) {
+    let compChoice = getComputerChoice(0, 3);
 
-let validateHumanAnswer = (answer, options) => {
-    return options.includes(answer);
-} 
-
-function notifyRound (humanChoice, computerChoice, roundResult) {
-    if (roundResult === 0) {
-        alert (`Draw! You both have ${humanChoice}.`);
+    let signal = new CustomEvent("updateState", {detail : {result : ""}});
+    if (option === compChoice) { // draw condition
+        signal.detail.result = "draw";
     }
-    else if (roundResult === 1) {
-        alert (`You won this round! ${humanChoice} beats ${computerChoice}!`);
-    } else {
-        alert (`You lost this round! ${humanChoice} loses to ${computerChoice}!`);
+    else if ((option === "rock" && compChoice === "scissors") ||
+        (option === "paper" && compChoice === "rock") ||
+        (option === "scissors" && compChoice === "paper")) { // win condition
+        signal.detail.result = "win";
     }
-}
-
-let rules = (humanAnswer, computerAnswer) => {
-    let result = 0; // 0 = draw, 1 = human win, 2 = computer win
-
-    if (computerAnswer === humanAnswer) return result;
-
-    switch (humanAnswer) {
-        case "rock": {
-            if (computerAnswer === "scissors") {
-                result = 1;
-            } else {
-                result = 2;
-            }
-            break;
-        }
-        case "scissors": {
-            if (computerAnswer === "paper") {
-                result = 1;
-            } else {
-                result = 2;
-            }
-            break;
-        }
-        case "paper": {
-            if (computerAnswer === "rock") {
-                return 1;
-            } else {
-                return 2;
-            }
-        }
+    else { // lose condition
+        signal.detail.result = "lose";
     }
 
-    return result;
+    document.dispatchEvent(signal);
 }
 
 function playGame () {
-    const ROUNDS = 5;
-    let humanScore = 0;
-    let computerScore = 0;
+    let container = document.querySelector(".container");
 
-    function playRound (humanChoice, computerChoice) {
-        // Functions
-        function applyResults(result) {
-            switch (result) {
-                case 1: {
-                    humanScore++;
-                    break;
-                }
-                case 2: {
-                    computerScore++;
-                    break;
-                }
+    container.addEventListener("click", (clickEvent) => {
+        var target = clickEvent.target.id;
+        switch (target) {
+            case ROCK_BUTTON: {
+                recordHumanChoice("rock");
+                break;
+            }
+            case PAPER_BUTTON: {
+                recordHumanChoice("paper");
+                break;
+            }
+            case SCISSORS_BUTTON: {
+                recordHumanChoice("scissors");
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+    });
+
+    document.addEventListener("updateState", (updateEvent) => {
+        const playerScoreField = document.querySelector(".player-score");
+        const computerScoreField = document.querySelector(".computer-score");
+        const roundInfo = document.querySelector(".round-info");
+
+        if (round++ > MAX_ROUNDS) {
+            if (!finishedGame) endGame();
+            return;
+        }
+
+        const result = updateEvent.detail.result;
+        switch (result) {
+            case "win": {
+                humanScore++;
+                playerScoreField.textContent = `Player score: ${humanScore}`;
+                break;
+            }
+            case "lose": {
+                computerScore++;
+                computerScoreField.textContent = `Computer score: ${computerScore}`;
+                break;
+            }
+            case "draw": {
+                break;
+            }
+            default: {
+                console.error("Error! Result is not recognized");
+                break;
             }
         }
 
-        // Logic
-        const humanAns = humanChoice();
-        const computerAns = computerChoice(options, 0, options.length);
-    
-        if (!validateHumanAnswer(humanAns, options)) {
-            computerScore++;
-            alert(`You have enterred incorrect answer: ${humanAns}! Computer won this round`);
-            return;
-        }
-    
-        const roundResult = rules(humanAns, computerAns);
-        applyResults(roundResult);
-        notifyRound(humanAns, computerAns, roundResult);
-    }
+        roundInfo.textContent = `Round ${round} of ${MAX_ROUNDS}`;
 
-    for (let i = 0; i < ROUNDS; ++i) {
-        playRound (getHumanChoice, getComputerChoice);
-        alert(`Round ${i + 1} ended!. Your score: ${humanScore}. Computer score: ${computerScore}`)
-    }
+        
 
-    const winner = humanScore > computerScore ? "Congratulation! You are the winner this time!" : "This time computer is stronger. Try to beat him next time!";
-    alert (winner);
+    });
 }
 
-// Start game
-const options = ["rock", "paper", "scissors"];
-//playGame();
+
+function endGame() {
+    const scoreContainer = document.querySelector(".score-container");
+    const infoContainer = document.querySelector(".info");
+    const resultBox = document.querySelector(".result-box");
+
+    const restartButton = document.createElement("button");
+    restartButton.classList.add("restart-button");
+    const finalMessage = document.createElement("p");
+    finalMessage.classList.add("message");
+
+    if (humanScore > computerScore) {
+        finalMessage.textContent = "🎉 Congratulation! You won this time! 🎉";
+        infoContainer.style["background-color"] = "lightgreen";
+        infoContainer.style["border-color"] = "green";
+        restartButton.style["background-color"] = "rgb(175, 255, 175)";
+        restartButton.style["border-color"] = "green";
+    }
+    else if (computerScore > humanScore) {
+        finalMessage.textContent = "💀 This time computer was stronger! You lost! 💀";
+        infoContainer.style["background-color"] = "lightcoral";
+        infoContainer.style["border-color"] = "red";
+        restartButton.style["background-color"] = "#fc9b9e";
+        restartButton.style["border-color"] = "red";
+    }
+    else {
+        finalMessage.textContent = "⚔️ That was a good fight! It's a draw! ⚔️";
+        infoContainer.style["background-color"] = "gold";
+        infoContainer.style["border-color"] = "goldenrod";
+        restartButton.style["background-color"] = "rgb(236, 218, 116)";
+        restartButton.style["border-color"] = "goldenrod";
+    }
+
+    scoreContainer.style["border-bottom"] = "1px solid black";
+    restartButton.textContent = "Press restart to play again";
+
+    resultBox.appendChild(finalMessage);
+    resultBox.appendChild(restartButton);
+    finishedGame = true;
+
+    
+    restartButton.addEventListener("click", () => {
+        computerScore = 0;
+        humanScore = 0;
+        round = 1;
+        scoreContainer.style["border-bottom"] = "none";
+        infoContainer.style["background-color"] = "transparent";
+        infoContainer.style["border-color"] = "black";
+
+        finalMessage.remove();
+        restartButton.remove();
+
+        finishedGame = false;
+    })
+}
+
+
+playGame ();
